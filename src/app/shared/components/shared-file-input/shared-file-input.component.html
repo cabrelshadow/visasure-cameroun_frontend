@@ -1,0 +1,19 @@
+<div class="w-full flex items-center gap-2">
+  <div>
+    <label class="label text-gray-600" [for]="id">{{ label }}</label>
+    <input
+      class="input input-bordered input-success bg-white text-gray-900"
+      type="file"
+      [id]="id"
+      (change)="onFileSelected($event)"
+    />
+  </div>
+
+  <div class="self-end pb-[6px]">
+    @if (fileName) {
+    <p class="self-end pb-2 text-green-600">
+      <strong>Nom du fichier :</strong> {{ fileName | truncate:20 }}
+    </p>
+    }
+  </div>
+</div>

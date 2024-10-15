@@ -1,0 +1,286 @@
+<div class="super-contain bg-white">
+  <app-nav-bar></app-nav-bar>
+
+  <div class="form w-full mb-20">
+    <div class="max-w-7xl mx-auto">
+      <h1 class="text-[#00647b] text-[50px] leading-[60px] font-[700]">
+        Formulaire de e-visa
+      </h1>
+      <h1 class="text-[#727272] text-[40px] leading-[60px] font-[500]">
+        Veuillez choisir le type de visa sollicité
+      </h1>
+
+      <!--  -->
+      <div class="grid grid-cols-3 gap-8 h-[300px] mt-[50px]">
+        @for (item of listVisa; track $index) {
+        <app-visa-prise [item]="item"></app-visa-prise> }
+      </div>
+      <!--  -->
+
+      <!--  -->
+      <div class="flex items-center gap-4">
+        <div class="">
+          <img class="h-[500px]" src="Image.svg" alt="image" />
+        </div>
+
+        <div
+          class="border w-[800px] h-auto bg-[#F1F5EB] rounded-md overflow-hidden"
+        >
+        <style>
+          .custom-input {
+            border: 1px solid #00647b; /* Couleur de la bordure */
+            /* Coins arrondis (facultatif) */
+          }
+        </style>
+          <div class="h-full w-full">
+            <form [formGroup]="visaForm">
+              <div class="row-form h-[85%] flex items-center">
+                <div class="min-h-full min-w-full">
+                  <h1
+                    class="text-[#00647b] text-[40px] leading-[60px] font-[500] text-center py-2"
+                  >
+                    {{ visaPlan.currentPlan.label || "E-visa de Court séjour" }}
+                  </h1>
+
+                  <div class="grid grid-cols-2 gap-4 h-full w-full p-4">
+                    <div class="overflow-hidden">
+                      <div class="form-control">
+                        <label class="label text-black" for="reason"
+                          >Raison du voyage</label
+                        >
+                        <select
+                          class="select select-ghost custom-input w-full max-w-xs bg-white text-black"
+                          formControlName="reason"
+                        >
+                          <option value="" disabled selected class=" text-black">
+                            Raison du voyage
+                          </option>
+                          <option value="travail" class="text-black">Travail</option>
+                          <option value="etude"  class="text-black">Etude</option>
+                          <option value="tourisme"  class="text-black">Tourisme</option>
+                          <option value="visite familial"  class="text-black">
+                            Visite Familiale
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="overflow-hidden">
+                      <div class="form-control">
+                        <label class="label text-gray-600" for="travelDate"
+                          >Date du voyage</label
+                        >
+                        <input
+                          class="input input-bordered custom-input bg-gray-300 text-gray-900"
+                          type="date"
+                          formControlName="travelDate"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="overflow-hidden">
+                      <div class="form-control">
+                        <label class="label text-gray-900" for="email"
+                          >Email</label
+                        >
+                        <input
+                          class="input input-bordered custom-input bg-white text-gray-900"
+                          type="email"
+                          formControlName="email"
+                          placeholder="Entrez l'email du voyageur"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="overflow-hidden">
+                      <div class="form-control">
+                        <label class="label text-gray-600" for="phoneNumber"
+                          >Numéro de téléphone</label
+                        >
+                        <input
+                          class="input input-bordered custom-input bg-white text-gray-900"
+                          type="text"
+                          formControlName="phoneNumber"
+                          placeholder="Entrez le numéro de téléphone"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="overflow-hidden">
+                      <div class="form-control">
+                        <label
+                          class="label text-gray-600 "
+                          for="friendlyNumberCountry"
+                          >Numéro d'un contact au pays</label
+                        >
+                        <input
+                          class="input input-bordered custom-input bg-white text-gray-900"
+                          type="text"
+                          formControlName="friendlyNumberCountry"
+                          placeholder="Entrez le numéro de contact"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <h1
+                    class="text-[#00647b] text-[30px] leading-[50px] font-[500] text-center py-2"
+                  >
+                    Ajouter le voyageur
+                  </h1>
+
+                  <div class="grid grid-cols-2 gap-4 h-full w-full p-4">
+                    <div class="form-control">
+                      <label class="label text-gray-600" for="firstName"
+                        >Nom</label
+                      >
+                      <input
+                        class="input input-bordered custom-input bg-white text-gray-900"
+                        type="text"
+                        formControlName="firstName"
+                        placeholder="Entrez votre nom"
+                      />
+                    </div>
+
+                    <div class="form-control">
+                      <label class="label text-gray-600" for="lastName"
+                        >Prénom</label
+                      >
+                      <input
+                        class="input input-bordered custom-input bg-white text-black"
+                        type="text"
+                        formControlName="lastName"
+                        placeholder="Entrez votre prénom"
+                      />
+                    </div>
+
+                    <div class="form-control">
+                      <label class="text-red"
+                        >NB : Date d’expiration du passeport <br />
+                        (>= à 6 mois à la date du jour)</label
+                      >
+                      <input
+                        class="input input-bordered custom-input bg-gray-300 text-gray-900"
+                        type="date"
+                        formControlName="passportExpiry"
+                      />
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="min-h-full min-w-full self-start">
+                  <h1
+                    class="text-[#00647b] text-[40px] leading-[40px] font-[500] text-center py-4"
+                  >
+                    documents obligatoires
+                  </h1>
+
+                  <div class="flex items-center gap-4 pl-5">
+                    <div class="font-[700] text-black">Etes-vous mineur ?</div>
+                    <br />
+                    <div>
+                      <p>oui</p>
+                      <input
+                        type="radio"
+                        name=""
+                        id=""
+                        (change)="isMinor(true,$event)"
+                      />
+                    </div>
+                    <div>
+                      <p>non</p>
+                      <input
+                        type="radio"
+                        name=""
+                        id=""
+                        (change)="isNotMinor(false,$event)"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 gap-4 h-full w-full p-4">
+                    @if (this.compteurRadio() === 2) {
+                    <app-shared-file-input
+                      label="Autorisation parentale"
+                      #parentalAuthorization
+                      id="parental-authorization"
+                      (fileContent)="
+                        handleFileContent('parentalAuthorization', $event)
+                      "
+                    >
+                    </app-shared-file-input>
+                    }
+                    <app-shared-file-input
+                      label="Passeport (photo de la première couverture)"
+                      id="passport"
+                      #passportPhoto
+                      (fileContent)="handleFileContent('passportPhoto', $event)"
+                    >
+                    </app-shared-file-input>
+                    <app-shared-file-input
+                      label="Carnet de vaccination contre la fièvre jaune"
+                      id="vaccination-card"
+                      #vaccinationCard
+                      (fileContent)="
+                        handleFileContent('vaccinationCard', $event)
+                      "
+                    >
+                    </app-shared-file-input>
+                    <app-shared-file-input
+                      label="Billet d'avion"
+                      #flightTicket
+                      id="flight-ticket"
+                      (fileContent)="
+                        handleFileContent('flightTicket', $event)
+                      "
+                    >
+                    </app-shared-file-input>
+                  </div>
+                </div>
+              </div>
+              <div class="h-[15%] border">
+                <div class="flex items-center gap-4 justify-center h-full py-4">
+                  @if (this.compteur() === 1) {
+                  <div>
+
+                    <div class="flex justify-center py-4">
+                      <button
+                        type="submit"
+                        class="btn btn-primary bg-[#00647b] text-white"
+                        [disabled]="visaForm.invalid"
+                        (click)="nextStep()"
+                      >
+                      Suivant
+                      </button>
+                    </div>
+                  </div>
+                  } @else {
+                  <div class="flex items-center gap-4">
+                    <div
+                      class="py-2 px-4 rounded-[100px] h-[45px] flex items-center justify-center cursor-pointer btn-wide bg-[#00647b] text-white"
+                      (click)="prevStep()"
+                    >
+                      Précedent
+                    </div>
+                    <div
+                      class="py-2 px-4 rounded-[100px] h-[45px] flex items-center justify-center cursor-pointer btn-wide bg-[#00647b] text-white"
+                      (click)="submitPayment()"
+                    >
+                      Payer ({{ visaPlan.currentPlan.price }})
+                    </div>
+                  </div>
+                  }
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!--  -->
+    </div>
+  </div>
+
+  <app-footer></app-footer>
+</div>
+
