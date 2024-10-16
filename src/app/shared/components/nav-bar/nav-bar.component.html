@@ -1,8 +1,5 @@
 <!-- start nave bar -->
 <nav class="sticky top-0 z-50 pt-4 mb-16  backdrop-blur-lg pb-4">
-  <!-- line -->
-  <!-- <img class="absolute -top-6 -z-5 -left-5" src="line.svg" alt="line"> -->
-  <!--  -->
 
   <div class="flex items-center justify-between max-w-7xl mx-auto">
       <div><img src="logg.svg" alt=""></div>
@@ -14,22 +11,15 @@
               <li (click)="goToVisaForm()">forumulaire e-visa</li>
           </ul>
       </div>
-      <style>
-          .custom-input {
-            border: 1px solid #ffffff; /* Couleur de la bordure */
-            /* Coins arrondis (facultatif) */
-          }
-        </style>
+
       <div class="flex items-center gap-2">
-          <div><img src="phone.svg" alt="phone"></div>
           <div>
-              <p class="font-[400] text-[14px]  text-[#141414]">Besoin d'aide?
-                <select name="" id="" class="custom-input bg-white">
-                  <option value="">(+237) 671577922</option>
-                  <option value="">(+237) 694342585</option>
-                  <option value="">(+237) 694342585</option>
-              </select>
-          </p>
+              <div class="font-[400] text-[14px]  text-[#141414] flex items-center gap-2"><span class="inline-block text-[#00647b]">Besoin d'aide?</span>  <div><img class="w-[15px] h-[15px]" src="phone.svg" alt="phone"></div></div>
+              <select name="" id="" class="custom-input bg-white border border-slate-400 outline-none selection:outline-none rounded-lg">
+                <option value="">(+237) 671577922</option>
+                <option value="">(+237) 694342585</option>
+                <option value="">(+237) 694342585</option>
+            </select>
           </div>
       </div>
   </div>
