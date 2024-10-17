@@ -31,7 +31,8 @@
             ],
             "styles": [
               "src/styles.scss",
-               "node_modules/tailwindcss/tailwind.css"
+               "node_modules/tailwindcss/tailwind.css",
+               "node_modules/ngx-toastr/toastr.css"
             ],
             "scripts": [],
             "server": "src/main.server.ts",

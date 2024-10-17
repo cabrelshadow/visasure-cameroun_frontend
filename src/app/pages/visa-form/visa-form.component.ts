@@ -1,25 +1,18 @@
+import { getBase64Files,getTypeOperation,hideLoader,showLoader,validateForm} from '../../shared/helpers/visa-form.helper';
 import { SharedFileInputComponent } from '../../shared/components/shared-file-input/shared-file-input.component';
 import { VisaPriseComponent } from '../../shared/components/visa-prise/visa-prise.component';
 import { VisaServicePlanService } from '../../shared/services/visa-service-plan.service';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import {FormBuilder,FormGroup,ReactiveFormsModule,Validators } from '@angular/forms';
+import { VisaOperationService } from '../../shared/services/visa-operation.service';
 import { NavBarComponent } from '../../shared/components/nav-bar/nav-bar.component';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
-import {
-  Base64File,
-  VisaOperation,
-  VisaPrise,
-  VisaTypeOperation,
-} from '../../shared/models/visa-prise.model';
+import { VisaOperation, VisaPrise } from '../../shared/models/visa-prise.model';
 import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
-import gsap from 'gsap';
-import { VisaOperationService } from '../../shared/services/visa-operation.service';
-import { ToastService } from '../../shared/services/toast.service';
 import { UploadService } from '../../shared/services/upload.service';
+import { ToastService } from '../../shared/services/toast.service';
+import {ToastrService } from 'ngx-toastr';
+import gsap from 'gsap';
+
 
 @Component({
   selector: 'app-visa-form',
@@ -35,6 +28,7 @@ import { UploadService } from '../../shared/services/upload.service';
   styleUrl: './visa-form.component.scss',
 })
 export class VisaFormComponent implements OnInit {
+
   compteur = signal(1);
   compteurRadio = signal(1);
   uploadedFiles: Array<{ name: string }> = [];
@@ -78,25 +72,35 @@ export class VisaFormComponent implements OnInit {
     },
   ];
 
-  ngOnInit(): void {
-    this.visaForm.get('lastName')?.valueChanges.subscribe((value) => {
-      this.cleanInput('lastName', value);
-    });
+  visaPlan = inject(VisaServicePlanService);
 
-    this.visaForm.get('firstName')?.valueChanges.subscribe((value) => {
-      this.cleanInput('firstName', value);
+  constructor(
+    private fb: FormBuilder,
+    private visaOperationSrv: VisaOperationService,
+    private uploadSrv: UploadService,
+    private visaPlanSrv: VisaServicePlanService,
+    private toastService: ToastService,
+    private toastr: ToastrService
+  ) {
+    this.visaForm = this.fb.group({
+      reason: ['', Validators.required],
+      type: [''],
+      travelDate: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      phoneNumber: ['', Validators.required],
+      lastName: ['', Validators.required],
+      firstName: ['', Validators.required],
+      passportExpiry: ['', Validators.required],
+      friendlyNumberCountry: ['', Validators.required],
+      isMinor: [false],
+      flightTicket: [null],
+      passportPhoto: [null],
+      vaccinationCard: [null],
+      parentalAuthorization: [null],
     });
-
-    this.visaForm.get('phoneNumber')?.valueChanges.subscribe((value) => {
-      this.cleanNumericInput('phoneNumber', value);
-    });
-
-    this.visaForm
-      .get('friendlyNumberCountry')
-      ?.valueChanges.subscribe((value) => {
-        this.cleanNumericInput('friendlyNumberCountry', value);
-      });
   }
+
+  ngOnInit(): void {}
 
   cleanInput(controlName: string, value: string): void {
     // Supprimer les caractères non alphanumériques
@@ -115,37 +119,21 @@ export class VisaFormComponent implements OnInit {
       ?.setValue(cleanedValue, { emitEvent: false });
   }
 
-  visaPlan = inject(VisaServicePlanService);
-
-  nextStep() {
-    gsap.to('.row-form', {
-      xPercent: -100,
-      duration: 0.5,
-    });
-    this.compteur.set(2);
-  }
-  prevStep() {
-    gsap.to('.row-form', {
-      xPercent: 0,
-      duration: 0.5,
-    });
-    this.compteur.set(1);
-  }
-
-  isMinor(isMinor: boolean,e: any) {
+  isMinor(isMinor: boolean, e: any) {
     this.resetInputRadio();
     e.target.checked = true;
     this.compteurRadio.set(2);
     this.visaForm.patchValue({
-      isMinor
+      isMinor,
     });
   }
+
   isNotMinor(isMinor: boolean, e: any) {
     this.resetInputRadio();
     e.target.checked = true;
     this.compteurRadio.set(1);
     this.visaForm.patchValue({
-      isMinor
+      isMinor,
     });
   }
 
@@ -177,120 +165,54 @@ export class VisaFormComponent implements OnInit {
       console.log('le cas ne corrrespond pas!');
     }
   }
-  constructor(
-    private fb: FormBuilder,
-    private visaOperationSrv: VisaOperationService,
-    private uploadSrv: UploadService,
-    private visaPlanSrv: VisaServicePlanService,
-    private toastService: ToastService,
-  ) {
-    this.visaForm = this.fb.group({
-      reason: ['', Validators.required],
-      type: [''],
-      travelDate: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      phoneNumber: ['', Validators.required],
-      lastName: ['', Validators.required],
-      firstName: ['', Validators.required],
-      passportExpiry: ['', Validators.required],
-      friendlyNumberCountry: ['', Validators.required],
-      isMinor: [false],
-      flightTicket: [null],
-      passportPhoto: [null],
-      vaccinationCard: [null],
-      parentalAuthorization: [null],
-    });
-  }
 
   async submitPayment() {
+    const validationErrors = validateForm(this.visaForm.value);
 
-    this.showLoader();
-    let type;
-    if (this.visaPlanSrv.currentPlan.id === 1) {
-      type = VisaTypeOperation.COURT_SEJOUR;
+    if (validationErrors.length > 0) {
+      // Affichez les messages d'erreur, par exemple dans une notification
+      this.toastr.warning('Erreur de validation', validationErrors.join(' '));
+      return; // Empêche la soumission si des erreurs sont présentes
     }
-    if (this.visaPlanSrv.currentPlan.id === 2) {
-      type = VisaTypeOperation.VISA_EXPRESS;
-    }
-    if (this.visaPlanSrv.currentPlan.id === 3) {
-      type = VisaTypeOperation.LONG_SEJOUR;
-    }
-    this.visaForm.patchValue({
-      type,
-    });
+
+    showLoader();
+    const type = getTypeOperation(this.visaPlanSrv.currentPlan.id);
+    this.visaForm.patchValue({ type });
+
     try {
-      const {
-        flightTicket,
-        parentalAuthorization,
-        passportPhoto,
-        vaccinationCard,
-      } = this.visaForm.value;
+      const isMinor = this.visaForm.value.isMinor;
+      const base64Files = getBase64Files(isMinor, this.visaForm.value);
 
-      // Création des objets Base64File
-      const flightTicketFile: Base64File = {
-        base64String: flightTicket?.content,
-        fileName: flightTicket?.fileName,
-      };
-
-      const parentalAuthorizationFile: Base64File = {
-        base64String: parentalAuthorization?.content,
-        fileName: parentalAuthorization?.fileName,
-      };
-
-      const passportPhotoFile: Base64File = {
-        base64String: passportPhoto?.content,
-        fileName: passportPhoto?.fileName,
-      };
-
-      const vaccinationCardFile: Base64File = {
-        base64String: vaccinationCard?.content,
-        fileName: vaccinationCard?.fileName,
-      };
-
-      const base64Files: Base64File[] = this.visaForm?.value?.isMinor ? [
-        flightTicketFile,
-        parentalAuthorizationFile,
-        passportPhotoFile,
-        vaccinationCardFile,
-      ]:[
-        flightTicketFile,
-        passportPhotoFile,
-        vaccinationCardFile,
-      ];
-
-      for (const element of base64Files) {
-        await this.uploadSrv.insertImage(element);
+      for (const file of base64Files) {
+        await this.uploadSrv.insertImage(file);
       }
 
-      this.removeContentFromFields(['parentalAuthorization', 'flightTicket', 'passportPhoto', 'vaccinationCard']);
+      this.removeContentFromFields([
+        'parentalAuthorization',
+        'flightTicket',
+        'passportPhoto',
+        'vaccinationCard',
+      ]);
 
       const visa = await this.visaOperationSrv.insertVisa(this.visaForm.value);
-      if (visa) this.hideLoader(), this.resetForm();
-      this.toastService.showToast('Opération réussie', `${visa?.message}`, 'success');
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 2500);
-
+      if (visa) {
+        hideLoader();
+        this.resetForm();
+        this.toastService.showToast(
+          'Opération réussie',
+          visa.message,
+          'success'
+        );
+        setTimeout(() => window.location.reload(), 2500);
+      }
     } catch (error: any) {
-      this.hideLoader();
+      hideLoader();
       this.toastService.showToast(
-        error?.response?.data?.message?.title || 'Erreur',
-        error?.response?.data?.message?.message || 'Une erreur est survenue.',
+        error.response?.data?.message?.title || 'Erreur',
+        error.response?.data?.message?.message || 'Une erreur est survenue.',
         'error'
       );
     }
-  }
-
-  showLoader() {
-    gsap.to('.overlay-modal', {
-      display: 'flex',
-    });
-  }
-  hideLoader() {
-    gsap.to('.overlay-modal', {
-      display: 'none',
-    });
   }
 
   resetForm(): void {
@@ -313,7 +235,7 @@ export class VisaFormComponent implements OnInit {
   }
 
   removeContentFromFields(fieldNames: string[]): void {
-    fieldNames.forEach(fieldName => {
+    fieldNames.forEach((fieldName) => {
       const field = this.visaForm.get(fieldName)?.value;
 
       if (field && typeof field === 'object') {
@@ -321,5 +243,47 @@ export class VisaFormComponent implements OnInit {
         this.visaForm.get(fieldName)?.setValue(field);
       }
     });
+  }
+
+  subscribeToFormChanges() {
+    this.visaForm.get('lastName')?.valueChanges.subscribe((value) => {
+      this.cleanInput('lastName', value);
+    });
+
+    this.visaForm.get('firstName')?.valueChanges.subscribe((value) => {
+      this.cleanInput('firstName', value);
+    });
+
+    this.visaForm.get('phoneNumber')?.valueChanges.subscribe((value) => {
+      this.cleanNumericInput('phoneNumber', value);
+    });
+
+    this.visaForm
+      .get('friendlyNumberCountry')
+      ?.valueChanges.subscribe((value) => {
+        this.cleanNumericInput('friendlyNumberCountry', value);
+      });
+  }
+
+  nextStep() {
+    const validationErrors = validateForm(this.visaForm.value);
+
+    if (validationErrors.length > 0) {
+      // Affichez les messages d'erreur, par exemple dans une notification
+      this.toastr.error('Erreur de validation', validationErrors.join(' '));
+      return; // Empêche la soumission si des erreurs sont présentes
+    }
+    gsap.to('.row-form', {
+      xPercent: -100,
+      duration: 0.5,
+    });
+    this.compteur.set(2);
+  }
+  prevStep() {
+    gsap.to('.row-form', {
+      xPercent: 0,
+      duration: 0.5,
+    });
+    this.compteur.set(1);
   }
 }
