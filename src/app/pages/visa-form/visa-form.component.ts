@@ -1,16 +1,16 @@
-import { getBase64Files,getTypeOperation,hideLoader,showLoader,validateForm} from '../../shared/helpers/visa-form.helper';
+import { getBase64Files, getTypeOperation, hideLoader, showLoader, validateForm } from '../../shared/helpers/visa-form.helper';
 import { SharedFileInputComponent } from '../../shared/components/shared-file-input/shared-file-input.component';
 import { VisaPriseComponent } from '../../shared/components/visa-prise/visa-prise.component';
-import { VisaServicePlanService } from '../../shared/services/visa-service-plan.service';
-import {FormBuilder,FormGroup,ReactiveFormsModule,Validators } from '@angular/forms';
-import { VisaOperationService } from '../../shared/services/visa-operation.service';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NavBarComponent } from '../../shared/components/nav-bar/nav-bar.component';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
+import { VisaServicePlanService } from '../../shared/services/visa-service-plan.service';
+import { VisaOperationService } from '../../shared/services/visa-operation.service';
 import { VisaOperation, VisaPrise } from '../../shared/models/visa-prise.model';
 import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { UploadService } from '../../shared/services/upload.service';
 import { ToastService } from '../../shared/services/toast.service';
-import {ToastrService } from 'ngx-toastr';
+import { ToastrService } from 'ngx-toastr';
 import gsap from 'gsap';
 
 
@@ -100,48 +100,37 @@ export class VisaFormComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   cleanInput(controlName: string, value: string): void {
     // Supprimer les caractères non alphanumériques
     const cleanedValue = value.replace(/[^0-9a-zA-Z]/g, '');
-
     // Mettre à jour la valeur du contrôle
-    this.visaForm
-      .get(controlName)
-      ?.setValue(cleanedValue, { emitEvent: false });
+    this.visaForm.get(controlName)?.setValue(cleanedValue, { emitEvent: false });
   }
 
   cleanNumericInput(controlName: string, value: string): void {
     const cleanedValue = value.replace(/[^0-9]/g, ''); // Conserver uniquement les chiffres
-    this.visaForm
-      .get(controlName)
-      ?.setValue(cleanedValue, { emitEvent: false });
+    this.visaForm.get(controlName)?.setValue(cleanedValue, { emitEvent: false });
   }
 
   isMinor(isMinor: boolean, e: any) {
     this.resetInputRadio();
     e.target.checked = true;
     this.compteurRadio.set(2);
-    this.visaForm.patchValue({
-      isMinor,
-    });
+    this.visaForm.patchValue({ isMinor });
   }
 
   isNotMinor(isMinor: boolean, e: any) {
     this.resetInputRadio();
     e.target.checked = true;
     this.compteurRadio.set(1);
-    this.visaForm.patchValue({
-      isMinor,
-    });
+    this.visaForm.patchValue({ isMinor });
   }
 
   resetInputRadio() {
     const result = document.querySelectorAll("input[type='radio']") as any;
-    result.forEach((element: HTMLInputElement) => {
-      element.checked = false;
-    });
+    result.forEach((element: HTMLInputElement) => { element.checked = false; });
   }
 
   handleFileContent(label: string, fileContent: any): void {
@@ -168,7 +157,6 @@ export class VisaFormComponent implements OnInit {
 
   async submitPayment() {
     const validationErrors = validateForm(this.visaForm.value);
-
     if (validationErrors.length > 0) {
       // Affichez les messages d'erreur, par exemple dans une notification
       this.toastr.warning('Erreur de validation', validationErrors.join(' '));
@@ -180,7 +168,7 @@ export class VisaFormComponent implements OnInit {
     this.visaForm.patchValue({ type });
 
     try {
-      const isMinor = this.visaForm.value.isMinor;
+      const isMinor = this.visaForm.value?.isMinor;
       const base64Files = getBase64Files(isMinor, this.visaForm.value);
 
       for (const file of base64Files) {
@@ -208,8 +196,8 @@ export class VisaFormComponent implements OnInit {
     } catch (error: any) {
       hideLoader();
       this.toastService.showToast(
-        error.response?.data?.message?.title || 'Erreur',
-        error.response?.data?.message?.message || 'Une erreur est survenue.',
+        error?.response?.data?.message?.title || 'Erreur',
+        error?.response?.data?.message?.message || 'Une erreur est survenue.',
         'error'
       );
     }
