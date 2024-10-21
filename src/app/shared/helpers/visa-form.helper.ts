@@ -47,20 +47,22 @@ export const validateForm = (object: any) => {
   }
 
   // Validation du numéro de téléphone (uniquement des chiffres et longueur de 9 chiffres)
-  const phoneRegex = /^\d{09}$/; // Assurez-vous que cela correspond à la longueur souhaitée
+  const phoneRegex = /^\d+$/; // Assurez-vous que cela correspond à la longueur souhaitée
   if (!phoneRegex.test(phoneNumber)) {
-    errors.push('Numéro de téléphone invalide (doit contenir 9 chiffres).');
+    errors.push(
+      'Le numéro de votre contact invalide (doit contenir uniquement des chiffres).'
+    );
   }
 
   // Validation du préfixe international (country code) (optionnel)
-  const friendlyNumberCountryRegex = /^\d+$/;
+  const friendlyNumberCountryRegex = /^\d{09}$/;
   if (
     friendlyNumberCountry &&
     !friendlyNumberCountryRegex.test(friendlyNumberCountry)
   ) {
-    errors.push(
-      'Le numéro de votre contact invalide (doit contenir uniquement des chiffres).'
-    );
+
+    errors.push('Numéro de téléphone invalide (doit contenir 9 chiffres).');
+
   }
 
   // Validation de la date de voyage (doit être dans le futur)
